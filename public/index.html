@@ -21,8 +21,8 @@
     ]
 
     window.addEventListener("load", function () {
-      //const socket = new WebSocket("ws://localhost:3000/ws");
-      const socket = new WebSocket(`wss://${window.location.host}/ws`);
+      const wsProtocol = location.protocol === "https:" ? 'wss' : 'ws';
+      const socket = new WebSocket(`${wsProtocol}://${window.location.host}/ws`);
 
       socket.onmessage = function (event) {
         if (typeof event.data === 'string') {
