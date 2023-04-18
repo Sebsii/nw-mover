@@ -16,7 +16,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', indexRouter);
 
 const UPDATE_INTERVAL = 0.05; // seconds
-const MAX_MOVE_SPEED = 50;
+const MAX_MOVE_SPEED = 40;
 var startTime = Date.now();
 
 var things = [
@@ -39,11 +39,10 @@ function Update() {
     SetThingDirections();
 }
 
-
 function MoveThings() {
     things.forEach(thing => {
         thing.x += thing.xDir;
-        thing.x = (thing.x + 255) % 255;
+        thing.x = (thing.x + 255) % 255; // wrap on over- and underflow
         thing.y += thing.yDir;
         thing.y = (thing.y + 255) % 255;
     });
@@ -51,7 +50,7 @@ function MoveThings() {
 
 // Direction includes the speed of the thing
 function SetThingDirections() {
-    console.log(`Setting directions after ${Date.now() - startTime} seconds`);
+    console.log(`Setting directions after ${Date.now() - startTime} milliseconds`);
     startTime = Date.now();
 
     things.forEach(thing => {
@@ -63,7 +62,7 @@ function SetThingDirections() {
 SetThingDirections();
 setInterval(Update, UPDATE_INTERVAL * 1000)
 
-console.log(`Update interval: ${UPDATE_INTERVAL * 1000} ms\n`)
+console.log(`Update interval: ${UPDATE_INTERVAL * 1000} ms`)
 
 module.exports = {
     app,

@@ -5,7 +5,7 @@
  */
 
 const webSocket = require('ws');
-var appStuff = require('../app');
+var appContainer = require('../app');
 var debug = require('debug')('nw-express:server');
 var http = require('http');
 const { setDefaultResultOrder } = require('dns');
@@ -15,23 +15,25 @@ const { setDefaultResultOrder } = require('dns');
  */
 
 var port = normalizePort(process.env.PORT || '3000');
-appStuff.app.set('port', port);
+appContainer.app.set('port', port);
 
 /**
  * Create HTTP server.
  */
 
-var server = http.createServer(appStuff.app);
+var server = http.createServer(appContainer.app);
 
-// ------ web socket stuff
+// ---- Web socket and app stuff made by Simon -----
+// *************************************************
 
 const wss = new webSocket.Server({ server });
 
 wss.on('connection', ws => {
-  ws.send('Connected to WebSockets server');
+  const SEND_INTERVAL = 100;
+  ws.send(`Connected to WebSockets server with an send interval of ${SEND_INTERVAL} milliseconds`);
 
   function SendThings() {
-    const things = appStuff.things;
+    const things = appContainer.things;
 
     const coordinatesArray = [];
     things.forEach(thing => {
@@ -43,9 +45,10 @@ wss.on('connection', ws => {
     ws.send(buffer);
   }
 
-  const SEND_INTERVAL = 100;
   setInterval(SendThings, SEND_INTERVAL)
+  console.log(`Send Interval: ${SEND_INTERVAL} ms`)
 });
+
 
 // ------
 
