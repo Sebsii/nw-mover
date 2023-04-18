@@ -15,7 +15,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
 
-const UPDATE_INTERVAL = 0.05; // seconds
+const UPDATE_INTERVAL = 0.01; // seconds
 const MAX_MOVE_SPEED = 20;
 var startTime = Date.now();
 
