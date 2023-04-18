@@ -1,0 +1,78 @@
+<html>
+
+<head>
+  <title>Object Mover</title>
+  <link rel="stylesheet" href="/stylesheets/style.css">
+
+</head>
+
+<body>
+  <h1>Some objects are moved here</h1>
+  <canvas id="canvas" width="256" height="256"></canvas>
+  <h2>Average of bytes received per second: <span id="bytes">Placeholder</span></h2>
+
+  <script>
+    const things = [
+      { x: 0, y: 0, color: "red" },
+      { x: 0, y: 0, color: "green" },
+      { x: 0, y: 0, color: "lightblue" },
+      { x: 0, y: 0, color: "pink" },
+      { x: 0, y: 0, color: "blue" },
+    ]
+
+    window.addEventListener("load", function () {
+
+      const socket = new WebSocket("ws://localhost:3000/ws");
+
+      socket.onmessage = function (event) {
+        if (typeof event.data === 'string') {
+          console.log(event.data);
+          return;
+        }
+
+        event.data.arrayBuffer().then(buffer => {
+          const view = new DataView(buffer);
+          for (let i = 0; i < things.length; i++) {
+            things[i].x = view.getUint8(i * 2);
+            things[i].y = view.getUint8(i * 2 + 1);
+          }
+
+          UpdateCanvas();
+          UpdateByteAverage(event.data.size);
+        });
+      };
+
+      const c = document.getElementById("canvas");
+      const ctx = c.getContext("2d");
+      const byteDisplay = document.getElementById("bytes")
+      var sumBytesReceived = 0;
+      var startTime = Date.now();
+
+      function UpdateCanvas() {
+        ctx.clearRect(0, 0, c.width, c.height)
+
+        things.forEach(thing => {
+          drawCircle(thing.x, thing.y, thing.color);
+        });
+      }
+
+      function UpdateByteAverage(bytes) {
+        sumBytesReceived += bytes;
+        var avg = sumBytesReceived / (Date.now() - startTime) * 1000
+        byteDisplay.textContent = avg.toFixed(2);
+      }
+
+      function drawCircle(x, y, fillColor) {
+        ctx.beginPath();
+        ctx.arc(x, y, 10, 0, 2 * Math.PI);
+        ctx.fillStyle = fillColor;
+        ctx.fill();
+        ctx.closePath();
+      }
+    });
+
+
+  </script>
+</body>
+
+</html>
