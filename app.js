@@ -15,8 +15,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
 
-const UPDATE_INTERVAL = 0.001; // seconds
-const MAX_MOVE_SPEED = 20;
+const UPDATE_INTERVAL = 0.05; // seconds
+const MAX_MOVE_SPEED = 50;
 var startTime = Date.now();
 
 var things = [
@@ -43,7 +43,9 @@ function Update() {
 function MoveThings() {
     things.forEach(thing => {
         thing.x += thing.xDir;
+        thing.x = (thing.x + 255) % 255;
         thing.y += thing.yDir;
+        thing.y = (thing.y + 255) % 255;
     });
 }
 
@@ -60,6 +62,8 @@ function SetThingDirections() {
 
 SetThingDirections();
 setInterval(Update, UPDATE_INTERVAL * 1000)
+
+console.log(`Update interval: ${UPDATE_INTERVAL * 1000} ms\n`)
 
 module.exports = {
     app,
